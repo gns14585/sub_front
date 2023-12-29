@@ -1,11 +1,10 @@
 import {
   Box,
+  Image,
+  SimpleGrid,
   Spinner,
-  Table,
-  Tbody,
   Td,
-  Th,
-  Thead,
+  Text,
   Tr,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
@@ -29,32 +28,23 @@ export function BoardList() {
   return (
     <Box>
       <h1>게시물 목록</h1>
-      <Box>
-        <Table>
-          <Thead>
-            <Tr>
-              <Th>id</Th>
-              <Th>title</Th>
-              <Th>by</Th>
-              <Th>at</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            {boardList.map((board) => (
-              <Tr
-                _hover={{ cursor: "pointer" }}
-                key={board.id}
-                onClick={() => navigate("/board/" + board.id)}
-              >
-                <Td>{board.id}</Td>
-                <Td>{board.title}</Td>
-                <Td>{board.writer}</Td>
-                <Td>{board.inserted}</Td>
-              </Tr>
-            ))}
-          </Tbody>
-        </Table>
-      </Box>
+      <SimpleGrid columns={3} spacing={9} m={20}>
+        {boardList.map((board) => (
+          <Box
+            _hover={{ cursor: "pointer" }}
+            key={board.id}
+            onClick={() => navigate("/board/" + board.id)}
+          >
+            <Box>
+              <Image src={board.mainImg} alt={board.name} />
+            </Box>
+            <Text>{board.id}</Text>
+            <Text>{board.title}</Text>
+            <Text>{board.writer}</Text>
+            <Text>{board.inserted}</Text>
+          </Box>
+        ))}
+      </SimpleGrid>
     </Box>
   );
 }

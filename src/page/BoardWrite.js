@@ -16,6 +16,7 @@ export function BoardWrite() {
   const [content, setContent] = useState("");
   const [writer, setWriter] = useState("");
   const toast = useToast();
+  const [mainImg, setMainImg] = useState(null);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -24,10 +25,11 @@ export function BoardWrite() {
   function handleSubmit() {
     setIsSubmitting(true);
     axios
-      .post("/api/board/add", {
+      .postForm("/api/board/add", {
         title,
         content,
         writer,
+        mainImg,
       })
       .then(() => {
         toast({
@@ -69,6 +71,16 @@ export function BoardWrite() {
             value={content}
             onChange={(e) => setContent(e.target.value)}
           ></Textarea>
+        </FormControl>
+
+        <FormControl>
+          <FormLabel>메인 이미지</FormLabel>
+          <Input
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={(e) => setMainImg(e.target.files)}
+          />
         </FormControl>
 
         <FormControl>
