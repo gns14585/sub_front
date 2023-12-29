@@ -1,25 +1,27 @@
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import {
+  createBrowserRouter,
+  createRoutesFromElements,
+  Route,
+  RouterProvider,
+} from "react-router-dom";
+import { HomeLayout } from "./layout/HomeLayout";
+import { BoardList } from "./page/BoardList";
+import { BoardWrite } from "./page/BoardWrite";
+import { BoardView } from "./page/BoardView";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+const routes = createBrowserRouter(
+  createRoutesFromElements(
+    <Route path="/" element={<HomeLayout />}>
+      <Route index element={<BoardList />} />
+      <Route path="write" element={<BoardWrite />} />
+      <Route path="board/:id" element={<BoardView />} />
+    </Route>,
+  ),
+);
+
+function App(props) {
+  return <RouterProvider router={routes} />;
 }
 
 export default App;
