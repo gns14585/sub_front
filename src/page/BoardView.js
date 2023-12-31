@@ -3,6 +3,7 @@ import {
   Button,
   FormControl,
   FormLabel,
+  Image,
   Input,
   Modal,
   ModalBody,
@@ -70,6 +71,13 @@ export function BoardView() {
         <FormLabel>본문</FormLabel>
         <Input value={board.content} readOnly />
       </FormControl>
+
+      {board.mainImgs.map((mainImg) => (
+        <Box key={mainImg.id} my="5px" border="3px solid black">
+          <Image w="100%" src={mainImg.url} alt={mainImg.name} />
+        </Box>
+      ))}
+
       <FormControl>
         <FormLabel>작성자</FormLabel>
         <Input value={board.writer} readOnly />

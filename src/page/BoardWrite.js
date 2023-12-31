@@ -2,6 +2,7 @@ import {
   Box,
   Button,
   FormControl,
+  FormHelperText,
   FormLabel,
   Input,
   Textarea,
@@ -81,6 +82,7 @@ export function BoardWrite() {
             multiple
             onChange={(e) => setMainImg(e.target.files)}
           />
+          <FormHelperText>한 개 파일은 1MB 용량으로 제한됩니다.</FormHelperText>
         </FormControl>
 
         <FormControl>
