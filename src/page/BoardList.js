@@ -36,9 +36,10 @@ export function BoardList() {
               key={board.id}
               onClick={() => navigate("/board/" + board.id)}
             >
-              <Box key={board.id} my="5px" border="3px solid black">
-                <Image w="100%" src={board.url} alt={board.name} />
-              </Box>
+              {/* 게시물의 첫 번째 이미지를 표시 */}
+              {board.mainImgs && board.mainImgs.length > 0 && (
+                <Image src={board.mainImgs[0].url} alt="Board Image" />
+              )}
 
               <Text>{board.id}</Text>
               <Text>title : {board.title}</Text>
