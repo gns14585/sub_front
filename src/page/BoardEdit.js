@@ -69,10 +69,10 @@ export function BoardEdit() {
       </FormControl>
 
       <FormControl>
-        <FormLabel>작성자</FormLabel>
+        <FormLabel>판매가</FormLabel>
         <Input
-          value={board.writer}
-          onChange={(e) => setBoard({ ...board, writer: e.target.value })}
+          value={board.price}
+          onChange={(e) => setBoard({ ...board, price: e.target.value })}
         />
       </FormControl>
 

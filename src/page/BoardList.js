@@ -26,6 +26,10 @@ export function BoardList() {
     return <Spinner />;
   }
 
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat("ko-KR", { style: "decimal" }).format(price);
+  };
+
   return (
     <Box justifyContent={"center"} border={"1px solid red"} w="100%">
       <Flex w="80%" justifyContent={"center"} display={"flex"}>
@@ -51,12 +55,10 @@ export function BoardList() {
                   alt="Board Image"
                 />
               )}
-
-              <Box>{board.id}</Box>
-              <Box>상품설명 : {board.title}</Box>
-              <Box>content : {board.content}</Box>
-              <Box>writer : {board.writer}</Box>
-              <Box>inserted : {board.inserted}</Box>
+              <Box color={"gray"} fontSize={"12px"}>
+                {board.title}
+              </Box>
+              <Box fontWeight={"bold"}>{formatPrice(board.price)}원</Box>
             </Box>
           ))}
         </SimpleGrid>

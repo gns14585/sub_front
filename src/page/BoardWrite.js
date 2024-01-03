@@ -21,7 +21,7 @@ import { useNavigate } from "react-router-dom";
 export function BoardWrite() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [writer, setWriter] = useState("");
+  const [price, setPrice] = useState("");
   const toast = useToast();
   const [mainImg, setMainImg] = useState(null);
 
@@ -41,15 +41,15 @@ export function BoardWrite() {
       .postForm("/api/board/add", {
         title,
         content,
-        writer,
+        price,
         mainImg,
       })
       .then((response) => {
-        details.forEach((e) => (e.boardId = response.data));
+        details.forEach((e) => (e.boardId = response.data)); // boardId 를 넣어줌
         axios.post("/api/board/addList", {
           title,
           content,
-          writer,
+          price,
           details,
         });
 
@@ -119,7 +119,7 @@ export function BoardWrite() {
 
         <FormControl>
           <FormLabel>판매가</FormLabel>
-          <Input value={writer} onChange={(e) => setWriter(e.target.value)} />
+          <Input value={price} onChange={(e) => setPrice(e.target.value)} />
         </FormControl>
 
         <VStack mt={10}>

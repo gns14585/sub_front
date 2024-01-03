@@ -43,7 +43,9 @@ export function BoardView() {
   const [selectedDetail, setSelectedDetail] = useState(null);
   const [selectedDetails, setSelectedDetails] = useState({});
 
+  // ------------------------- 렌더링시 게시물 가져오기 -------------------------
   useEffect(() => {
+    // ---------- 상세선택 ----------
     axios
       .get("/api/board/details/" + id)
       .then((response) => {
@@ -57,6 +59,7 @@ export function BoardView() {
   }, [id]);
 
   useEffect(() => {
+    // ---------- 게시물 ----------
     axios
       .get("/api/board/id/" + id)
       .then((response) => setBoard(response.data));
@@ -66,6 +69,7 @@ export function BoardView() {
     return <Spinner />;
   }
 
+  // ------------------------- 게시물 삭제 로직 -------------------------
   function handleDelete() {
     axios
       .delete("/api/board/remove/" + id)
@@ -86,34 +90,38 @@ export function BoardView() {
       .finally(() => onClose());
   }
 
-  // 상세정보 클릭 시 해당 문구로 변경
-  const handleSelectDetail = (detail) => {
-    // 고유 키 생성 (예: 색상-축-선)
-    const key = `${detail.color}-${detail.axis}-${detail.line}`;
+  // ------------------------- 가격 , 쉼표구분 -------------------------
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat("ko-KR", { style: "decimal" }).format(price);
+  };
 
+  // ------------------------- 수량마다 가격 변경로직 -------------------------
+  const handleSelectDetail = (detail) => {
+    const key = `${detail.color}-${detail.axis}-${detail.line}`;
     setSelectedDetails((prevDetails) => {
-      // 이미 선택된 상세 정보가 있는 경우 수량 증가
-      if (prevDetails[key]) {
+      const existingDetail = prevDetails[key];
+      if (existingDetail) {
         return {
           ...prevDetails,
           [key]: {
-            ...detail,
-            quantity: prevDetails[key].quantity + 1,
+            ...existingDetail,
+            quantity: existingDetail.quantity + 1,
+            price: board.price,
           },
         };
       }
-
-      // 새로운 상세 정보인 경우 추가
       return {
         ...prevDetails,
         [key]: {
           ...detail,
           quantity: 1,
+          price: board.price,
         },
       };
     });
   };
 
+  // ------------------------- 수량 증가 로직 -------------------------
   const increaseQuantity = (key) => {
     setSelectedDetails((prevDetails) => ({
       ...prevDetails,
@@ -124,16 +132,45 @@ export function BoardView() {
     }));
   };
 
-  // 수량 감소 함수
+  // ------------------------- 수량 감소 로직 -------------------------
   const decreaseQuantity = (key) => {
-    setSelectedDetails((prevDetails) => ({
-      ...prevDetails,
-      [key]: {
-        ...prevDetails[key],
-        quantity:
-          prevDetails[key].quantity > 1 ? prevDetails[key].quantity - 1 : 1,
-      },
-    }));
+    setSelectedDetails((prevDetails) => {
+      // 현재 항목의 수량 확인
+      const currentQuantity = prevDetails[key].quantity;
+
+      if (currentQuantity > 1) {
+        // 수량이 1보다 크면 수량 감소
+        return {
+          ...prevDetails,
+          [key]: {
+            ...prevDetails[key],
+            quantity: currentQuantity - 1,
+          },
+        };
+      } else {
+        // 수량이 1이면 해당 항목을 목록에서 제거
+        const { [key]: _, ...rest } = prevDetails;
+        return rest;
+      }
+    });
+  };
+
+  // ------------------------- 총 가격 계산 로직 -------------------------
+  const calculateTotalPrice = () => {
+    const total = Object.values(selectedDetails).reduce((total, detail) => {
+      const price = detail.price || 0;
+      return total + price * detail.quantity;
+    }, 0);
+
+    return formatPrice(total); // 총액 포매팅
+  };
+
+  // ------------------------- 추가한 상품 삭제 로직 -------------------------
+  const handleRemoveDetail = (key) => {
+    setSelectedDetails((prevDetails) => {
+      const { [key]: _, ...rest } = prevDetails;
+      return rest;
+    });
   };
 
   return (
@@ -165,38 +202,28 @@ export function BoardView() {
           <VStack w="60%" ml={5}>
             <FormControl>
               <FormLabel fontWeight="bold">상품명</FormLabel>
-              <Input
-                mt={-2}
-                p={0}
-                border={"none"}
-                value={board.title}
-                readOnly
-              />
+              <Box mt={-2} p={0} border={"none"}>
+                {board.title}
+              </Box>
             </FormControl>
             <FormControl>
               <FormLabel fontWeight="bold">상품 설명</FormLabel>
-              <Input
-                mt={-2}
-                p={0}
-                border={"none"}
-                value={board.content}
-                readOnly
-              />
+              <Box mt={-2} p={0} border={"none"} readOnly>
+                {board.content}
+              </Box>
             </FormControl>
 
             <FormControl>
               <FormLabel fontWeight="bold">판매가</FormLabel>
-              <Input
-                mt={-2}
-                p={0}
-                border={"none"}
-                value={board.writer}
-                readOnly
-              />
+              <Box mt={-2} p={0} border={"none"} readOnly>
+                {formatPrice(board.price)}원
+              </Box>
             </FormControl>
             <FormControl>
               <FormLabel fontWeight="bold">배송</FormLabel>
-              <Input mt={-2} p={0} border={"none"} value="무료배송" readOnly />
+              <Box mt={-2} p={0} border={"none"}>
+                무료배송
+              </Box>
             </FormControl>
 
             {/* -------------------------- 상세선택 메뉴바 -------------------------- */}
@@ -237,48 +264,84 @@ export function BoardView() {
                   </MenuList>
                 </Menu>
               </Box>
-              {Object.entries(selectedDetails).map(([key, detail], index) => (
-                <Box
-                  key={index}
-                  p={4}
-                  borderWidth="1px"
-                  mt={2}
-                  display="flex"
-                  alignItems="center"
-                >
-                  <Text flex="1">
-                    {board.title} {detail.axis}, [{detail.color}/{detail.line}
-                    선]
-                  </Text>
-                  <HStack border={"1px solid gray"} borderRadius={"10px"}>
-                    <Button
-                      size={"sm"}
-                      bg={"none"}
-                      borderRight={"1px solid gray"}
-                      borderRadius={0}
-                      p={0}
-                      onClick={() => increaseQuantity(key)}
-                      _hover={{ bg: "none" }}
-                      _active={{ bg: "none" }}
+              <Box>
+                {Object.entries(selectedDetails).map(([key, detail], index) => (
+                  <Box bg="#F9F9F9" border={"1px solid #F9F9F9"}>
+                    <Box
+                      border={"none"}
+                      key={index}
+                      p={4}
+                      borderWidth="1px"
+                      mt={2}
+                      display="flex"
+                      alignItems="center"
+                      justifyContent={"space-between"}
                     >
-                      <ChevronUpIcon />
-                    </Button>
-                    <Box>{detail.quantity}</Box>
-                    <Button
-                      size={"sm"}
-                      bg={"none"}
-                      borderLeft={"1px solid gray"}
-                      borderRadius={0}
-                      p={0}
-                      onClick={() => decreaseQuantity(key)}
-                      _hover={{ bg: "none" }}
-                      _active={{ bg: "none" }}
+                      <Text fontSize={"15px"} flex="1">
+                        {board.title} {detail.axis}, [{detail.color}/
+                        {detail.line}]
+                      </Text>
+                      <Button
+                        size={"sm"}
+                        onClick={() => handleRemoveDetail(key)}
+                        bg={"none"}
+                        _hover={{ cursor: "background: none" }}
+                        _active={{ bg: "none" }}
+                      >
+                        X
+                      </Button>
+                    </Box>
+                    <HStack
+                      w={"74px"}
+                      border={"1px solid gray"}
+                      borderRadius={"10px"}
+                      bg={"white"}
+                      m={3}
                     >
-                      <ChevronDownIcon />
-                    </Button>
-                  </HStack>
+                      <Button
+                        size={"xs"}
+                        bg={"none"}
+                        borderRight={"1px solid gray"}
+                        borderRadius={0}
+                        p={0}
+                        onClick={() => increaseQuantity(key)}
+                        _hover={{ bg: "none" }}
+                        _active={{ bg: "none" }}
+                      >
+                        <ChevronUpIcon />
+                      </Button>
+                      <Box>{detail.quantity}</Box>
+                      <Button
+                        size={"xs"}
+                        bg={"none"}
+                        borderLeft={"1px solid gray"}
+                        borderRadius={0}
+                        p={0}
+                        onClick={() => decreaseQuantity(key)}
+                        _hover={{ bg: "none" }}
+                        _active={{ bg: "none" }}
+                      >
+                        <ChevronDownIcon />
+                      </Button>
+                    </HStack>
+                  </Box>
+                ))}
+                <Box mt={10} textAlign={"end"}>
+                  <Box textAlign={"end"}>
+                    <Text color={"gray"}>총 합계 금액</Text>
+                    <Text
+                      style={{
+                        color: "red",
+                        fontSize: "25px",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      {calculateTotalPrice()}
+                      <span style={{ fontSize: "18px" }}>원</span>
+                    </Text>
+                  </Box>
                 </Box>
-              ))}
+              </Box>
             </Box>
           </VStack>
         </Flex>
