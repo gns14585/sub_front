@@ -25,7 +25,6 @@ export function BoardWrite() {
   const toast = useToast();
   const [mainImg, setMainImg] = useState(null);
 
-  const [productName, setProductName] = useState("");
   const [color, setColor] = useState("");
   const [axis, setAxis] = useState("");
   const [line, setLine] = useState("");
@@ -79,9 +78,8 @@ export function BoardWrite() {
   }
 
   const handleAddDetail = () => {
-    setDetails([...details, { productName, color, axis, line }]);
+    setDetails([...details, { color, axis, line }]);
     // 필드 초기화
-    setProductName("");
     setColor("");
     setAxis("");
     setLine("");
@@ -120,18 +118,13 @@ export function BoardWrite() {
         </FormControl>
 
         <FormControl>
-          <FormLabel>작성자</FormLabel>
+          <FormLabel>판매가</FormLabel>
           <Input value={writer} onChange={(e) => setWriter(e.target.value)} />
         </FormControl>
 
         <VStack mt={10}>
           <Box style={{ fontWeight: "bold", fontSize: "20px" }}>상세 선택</Box>
           <HStack>
-            <Text w="180px">추가상품명 : </Text>
-            <Input
-              value={productName}
-              onChange={(e) => setProductName(e.target.value)}
-            />
             <Text w="130px">색상 : </Text>
             <Input
               value={color}
@@ -161,8 +154,7 @@ export function BoardWrite() {
           </HStack>
           {details.map((detail, index) => (
             <Box key={index}>
-              상품명: {detail.productName}, 색상: {detail.color}, 스위치:{" "}
-              {detail.axis}, 선: {detail.line}
+              색상: {detail.color}, 스위치: {detail.axis}, 선: {detail.line}
             </Box>
           ))}
         </VStack>
