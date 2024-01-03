@@ -4,6 +4,7 @@ import {
   Flex,
   FormControl,
   FormLabel,
+  HStack,
   Image,
   Input,
   Modal,
@@ -125,14 +126,14 @@ export function BoardView() {
         {/* 기존 UI 코드 */}
         <Box>
           {/* 상세 정보 출력 */}
-          <h2>상세 정보</h2>
+          <Box>상세 정보</Box>
           {details.map((detail, id) => (
-            <div key={id}>
+            <HStack key={id}>
               <p>상품명: {detail.productName}</p>
               <p>색상: {detail.color}</p>
               <p>축: {detail.axis}</p>
               <p>선: {detail.line}</p>
-            </div>
+            </HStack>
           ))}
         </Box>
         {/* 기존 UI 코드 */}

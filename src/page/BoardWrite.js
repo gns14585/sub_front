@@ -45,8 +45,14 @@ export function BoardWrite() {
         writer,
         mainImg,
       })
-      .then(() => {
-        axios.post("/api/board/addList", { title, content, writer, details });
+      .then((response) => {
+        details.forEach((e) => (e.boardId = response.data));
+        axios.post("/api/board/addList", {
+          title,
+          content,
+          writer,
+          details,
+        });
 
         toast({
           description: "새 글 작성되었습니다.",
