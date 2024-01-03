@@ -1,5 +1,6 @@
 import {
   Box,
+  Flex,
   Image,
   SimpleGrid,
   Spinner,
@@ -27,29 +28,39 @@ export function BoardList() {
 
   return (
     <Box justifyContent={"center"} border={"1px solid red"} w="100%">
-      <Box w="80%" justifyContent={"center"} display={"flex"}>
+      <Flex w="80%" justifyContent={"center"} display={"flex"}>
         <h1>게시물 목록</h1>
         <SimpleGrid columns={3} spacing={9} m={20}>
           {boardList.map((board) => (
             <Box
-              _hover={{ cursor: "pointer" }}
+              _hover={{
+                cursor: "pointer",
+                bg: "gray.100",
+                transform: "scale(1.05)", // 이미지를 약간 확대합니다.
+                transition: "transform 0.2s",
+              }}
               key={board.id}
               onClick={() => navigate("/board/" + board.id)}
+              borderRadius="10px"
             >
               {/* 게시물의 첫 번째 이미지를 표시 */}
               {board.mainImgs && board.mainImgs.length > 0 && (
-                <Image src={board.mainImgs[0].url} alt="Board Image" />
+                <Image
+                  borderRadius="10px"
+                  src={board.mainImgs[0].url}
+                  alt="Board Image"
+                />
               )}
 
-              <Text>{board.id}</Text>
-              <Text>title : {board.title}</Text>
-              <Text>content : {board.content}</Text>
-              <Text>writer : {board.writer}</Text>
-              <Text>inserted : {board.inserted}</Text>
+              <Box>{board.id}</Box>
+              <Box>상품설명 : {board.title}</Box>
+              <Box>content : {board.content}</Box>
+              <Box>writer : {board.writer}</Box>
+              <Box>inserted : {board.inserted}</Box>
             </Box>
           ))}
         </SimpleGrid>
-      </Box>
+      </Flex>
     </Box>
   );
 }

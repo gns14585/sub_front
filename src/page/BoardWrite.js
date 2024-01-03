@@ -1,12 +1,18 @@
 import {
   Box,
   Button,
+  Flex,
   FormControl,
   FormHelperText,
   FormLabel,
+  HStack,
   Input,
+  Menu,
+  MenuItem,
+  Text,
   Textarea,
   useToast,
+  VStack,
 } from "@chakra-ui/react";
 import { useState } from "react";
 import axios from "axios";
@@ -19,12 +25,19 @@ export function BoardWrite() {
   const toast = useToast();
   const [mainImg, setMainImg] = useState(null);
 
+  const [productName, setProductName] = useState("");
+  const [color, setColor] = useState("");
+  const [axis, setAxis] = useState("");
+  const [line, setLine] = useState("");
+
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const navigate = useNavigate();
+  const [details, setDetails] = useState([]);
 
   function handleSubmit() {
     setIsSubmitting(true);
+
     axios
       .postForm("/api/board/add", {
         title,
@@ -33,6 +46,8 @@ export function BoardWrite() {
         mainImg,
       })
       .then(() => {
+        axios.post("/api/board/addList", { title, content, writer, details });
+
         toast({
           description: "새 글 작성되었습니다.",
           status: "success",
@@ -57,17 +72,31 @@ export function BoardWrite() {
       .finally(() => setIsSubmitting(false));
   }
 
+  const handleAddDetail = () => {
+    setDetails([...details, { productName, color, axis, line }]);
+    // 필드 초기화
+    setProductName("");
+    setColor("");
+    setAxis("");
+    setLine("");
+  };
+
+  // 상세 항목 제거 함수
+  const handleRemoveDetail = () => {
+    setDetails(details.slice(0, -1));
+  };
+
   return (
     <Box>
       <h1>게시물 작성</h1>
       <Box>
         <FormControl>
-          <FormLabel>제목</FormLabel>
+          <FormLabel>상품명</FormLabel>
           <Input value={title} onChange={(e) => setTitle(e.target.value)} />
         </FormControl>
 
         <FormControl>
-          <FormLabel>본문</FormLabel>
+          <FormLabel>상품설명</FormLabel>
           <Textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
@@ -82,7 +111,6 @@ export function BoardWrite() {
             multiple
             onChange={(e) => setMainImg(e.target.files)}
           />
-          <FormHelperText>한 개 파일은 1MB 용량으로 제한됩니다.</FormHelperText>
         </FormControl>
 
         <FormControl>
@@ -90,7 +118,52 @@ export function BoardWrite() {
           <Input value={writer} onChange={(e) => setWriter(e.target.value)} />
         </FormControl>
 
+        <VStack mt={10}>
+          <Box style={{ fontWeight: "bold", fontSize: "20px" }}>상세 선택</Box>
+          <HStack>
+            <Text w="180px">상품명 : </Text>
+            <Input
+              value={productName}
+              onChange={(e) => setProductName(e.target.value)}
+            />
+            <Text w="130px">색상 : </Text>
+            <Input
+              value={color}
+              onChange={(e) => setColor(e.target.value)}
+              w="50%"
+            />
+            <Text w="180px">스위치 : </Text>
+            <Input
+              value={axis}
+              onChange={(e) => setAxis(e.target.value)}
+              w="50%"
+            />
+            <Text w="80px">선 :</Text>
+            <Input
+              value={line}
+              onChange={(e) => setLine(e.target.value)}
+              w="10%"
+            />
+          </HStack>
+          <HStack>
+            <Button w="100px" onClick={handleAddDetail}>
+              추가
+            </Button>
+            <Button w="100px" onClick={handleRemoveDetail}>
+              빼기
+            </Button>
+          </HStack>
+          {details.map((detail, index) => (
+            <Box key={index}>
+              상품명: {detail.productName}, 색상: {detail.color}, 스위치:{" "}
+              {detail.axis}, 선: {detail.line}
+            </Box>
+          ))}
+        </VStack>
+
+        {/* 저장 버튼 */}
         <Button
+          mt={10}
           isDisabled={isSubmitting}
           onClick={handleSubmit}
           colorScheme="blue"

@@ -1,6 +1,7 @@
 import {
   Box,
   Button,
+  Flex,
   FormControl,
   FormLabel,
   Image,
@@ -13,8 +14,10 @@ import {
   ModalHeader,
   ModalOverlay,
   Spinner,
+  Text,
   useDisclosure,
   useToast,
+  VStack,
 } from "@chakra-ui/react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -29,6 +32,21 @@ export function BoardView() {
 
   const toast = useToast();
   const navigate = useNavigate();
+
+  const [details, setDetails] = useState([]);
+
+  useEffect(() => {
+    axios
+      .get("/api/board/details/" + id)
+      .then((response) => {
+        setDetails(response.data);
+        console.log(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching details:", error);
+      })
+      .finally(() => console.log("끝"));
+  }, [id]);
 
   useEffect(() => {
     axios
@@ -61,37 +79,94 @@ export function BoardView() {
   }
 
   return (
-    <Box>
+    <Box w="100%">
       <h1>글 보기</h1>
-      <FormControl>
-        <FormLabel>제목</FormLabel>
-        <Input value={board.title} readOnly />
-      </FormControl>
-      <FormControl>
-        <FormLabel>본문</FormLabel>
-        <Input value={board.content} readOnly />
-      </FormControl>
 
-      {board.mainImgs.map((mainImg) => (
-        <Box key={mainImg.id} my="5px" border="3px solid black">
-          <Image w="100%" src={mainImg.url} alt={mainImg.name} />
+      <Box>
+        <Button colorScheme="blue" onClick={() => navigate("/edit/" + id)}>
+          수정
+        </Button>
+        <Button colorScheme="red" onClick={onOpen}>
+          삭제
+        </Button>
+      </Box>
+
+      <Flex>
+        <Box>
+          {board.mainImgs.map((mainImg) => (
+            <Box key={mainImg.id} my="5px" w="100%" border="3px solid black">
+              <Image w="100%" src={mainImg.url} alt={mainImg.name} />
+            </Box>
+          ))}
         </Box>
-      ))}
 
-      <FormControl>
-        <FormLabel>작성자</FormLabel>
-        <Input value={board.writer} readOnly />
-      </FormControl>
-      <FormControl>
-        <FormLabel>작성일시</FormLabel>
-        <Input value={board.inserted} readOnly />
-      </FormControl>
-      <Button colorScheme="blue" onClick={() => navigate("/edit/" + id)}>
-        수정
-      </Button>
-      <Button colorScheme="red" onClick={onOpen}>
-        삭제
-      </Button>
+        <VStack w="70%">
+          <FormControl>
+            <FormLabel fontWeight="bold">상품명</FormLabel>
+            <Input value={board.title} readOnly />
+          </FormControl>
+          <FormControl>
+            <FormLabel fontWeight="bold">상품 설명</FormLabel>
+            <Input value={board.content} readOnly />
+          </FormControl>
+
+          <FormControl>
+            <FormLabel fontWeight="bold">판매가</FormLabel>
+            <Input value={board.writer} readOnly />
+          </FormControl>
+          <FormControl>
+            <FormLabel fontWeight="bold">작성일시</FormLabel>
+            <Input value={board.inserted} readOnly />
+          </FormControl>
+        </VStack>
+      </Flex>
+
+      <Box w="100%">
+        {/* 기존 UI 코드 */}
+        <Box>
+          {/* 상세 정보 출력 */}
+          <h2>상세 정보</h2>
+          {details.map((detail, id) => (
+            <div key={id}>
+              <p>상품명: {detail.productName}</p>
+              <p>색상: {detail.color}</p>
+              <p>축: {detail.axis}</p>
+              <p>선: {detail.line}</p>
+            </div>
+          ))}
+        </Box>
+        {/* 기존 UI 코드 */}
+      </Box>
+
+      <Box mt={10}>
+        <Text fontWeight="bold" fontSize="30px">
+          상품 사용 후기
+        </Text>
+        <FormControl>
+          <FormLabel>제목</FormLabel>
+          <Input />
+        </FormControl>
+        <FormControl>
+          <FormLabel>내용</FormLabel>
+          <Input />
+        </FormControl>
+        <Button colorScheme="blue">저장</Button>
+      </Box>
+
+      <Box mt={10}>
+        <Text fontWeight="bold" fontSize="30px">
+          상품 Q & N
+        </Text>
+        <FormControl>
+          <FormLabel>제목</FormLabel>
+          <Input />
+        </FormControl>
+        <FormControl>
+          <FormLabel>내용</FormLabel>
+          <Input />
+        </FormControl>
+        <Button colorScheme="blue">저장</Button>
+      </Box>
 
       {/* 삭제 모달 */}
       <Modal isOpen={isOpen} onClose={onClose}>
