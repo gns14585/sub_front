@@ -121,7 +121,7 @@ export function BoardWrite() {
         <VStack mt={10}>
           <Box style={{ fontWeight: "bold", fontSize: "20px" }}>상세 선택</Box>
           <HStack>
-            <Text w="180px">상품명 : </Text>
+            <Text w="180px">추가상품명 : </Text>
             <Input
               value={productName}
               onChange={(e) => setProductName(e.target.value)}
