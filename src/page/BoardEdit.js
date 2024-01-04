@@ -65,14 +65,12 @@ export function BoardEdit() {
       });
   }
 
-  function handleRemoveMainImgSwitch(e) {
-    if (e.target.checked) {
-      setRemoveMainImgs([...removeMainImgs, e.target.value]);
-    } else {
-      setRemoveMainImgs(
-        removeMainImgs.filter((item) => item !== e.target.value),
-      );
-    }
+  function handleRemoveMainImgSwitch(mainImgId) {
+    setBoard((prevBoard) => ({
+      ...prevBoard,
+      mainImgs: prevBoard.mainImgs.filter((img) => img.id !== mainImgId),
+    }));
+    setRemoveMainImgs((prev) => [...prev, mainImgId]);
   }
 
   return (
@@ -104,23 +102,21 @@ export function BoardEdit() {
       </FormControl>
 
       <Flex>
-        {/* 이미지 출력 */}
         {board.mainImgs.length > 0 &&
-          board.mainImgs.map((mainImg) => (
-            <Box key={mainImg.id} my="5px">
+          board.mainImgs.map((img) => (
+            <Box key={img.id} my="5px">
               <FormControl display="flex" alignItems="center">
                 <FormLabel>
                   <FontAwesomeIcon color="red" icon={faTrashCan} />
                 </FormLabel>
                 <Switch
-                  value={mainImg.id}
+                  value={img.id}
                   colorScheme="red"
-                  onChange={handleRemoveMainImgSwitch}
+                  onChange={() => handleRemoveMainImgSwitch(img.id)}
                 />
               </FormControl>
-
               <Box>
-                <Image src={mainImg.url} alt={mainImg.name} w={"150px"} />
+                <Image src={img.url} alt={img.name} w="150px" />
               </Box>
             </Box>
           ))}
