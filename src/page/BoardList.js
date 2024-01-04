@@ -1,13 +1,4 @@
-import {
-  Box,
-  Flex,
-  Image,
-  SimpleGrid,
-  Spinner,
-  Td,
-  Text,
-  Tr,
-} from "@chakra-ui/react";
+import { Box, Flex, Image, SimpleGrid, Spinner } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
