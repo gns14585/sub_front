@@ -34,9 +34,10 @@ export function BoardWrite() {
   const navigate = useNavigate();
   const [details, setDetails] = useState([]);
 
+  // ------------------------------ 저장버튼 클릭 로직 ------------------------------
   function handleSubmit() {
     setIsSubmitting(true);
-
+    // 상품 저장 로직
     axios
       .postForm("/api/board/add", {
         title,
@@ -45,6 +46,7 @@ export function BoardWrite() {
         mainImg,
       })
       .then((response) => {
+        // ------------------------------ 상품 저장시 상세항목 저장 로직 ------------------------------
         details.forEach((e) => (e.boardId = response.data)); // boardId 를 넣어줌
         axios.post("/api/board/addList", {
           title,
@@ -52,7 +54,6 @@ export function BoardWrite() {
           price,
           details,
         });
-
         toast({
           description: "새 글 작성되었습니다.",
           status: "success",
@@ -77,15 +78,14 @@ export function BoardWrite() {
       .finally(() => setIsSubmitting(false));
   }
 
+  // ------------------------------ 상세선택 관련 로직 ------------------------------
   const handleAddDetail = () => {
     setDetails([...details, { color, axis, line }]);
-    // 필드 초기화
     setColor("");
     setAxis("");
     setLine("");
   };
-
-  // 상세 항목 제거 함수
+  // ------------------------------ 상세 선택항목 제거 함수 ------------------------------
   const handleRemoveDetail = () => {
     setDetails(details.slice(0, -1));
   };

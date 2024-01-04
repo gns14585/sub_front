@@ -16,6 +16,7 @@ export function BoardList() {
   const [boardList, setBoardList] = useState(null);
   const navigate = useNavigate();
 
+  // ------------------------------ 상품리스트 렌더링 로직 ------------------------------
   useEffect(() => {
     axios
       .get("/api/board/list")
@@ -26,6 +27,7 @@ export function BoardList() {
     return <Spinner />;
   }
 
+  // ------------------------------ 가격 ex) 1,000 ,로 구분지어 보여지게 처리 ------------------------------
   const formatPrice = (price) => {
     return new Intl.NumberFormat("ko-KR", { style: "decimal" }).format(price);
   };

@@ -20,6 +20,7 @@ export function BoardEdit() {
 
   const toast = useToast();
 
+  // ------------------------------ 상품 클릭시 상품 렌더링 ------------------------------
   useEffect(() => {
     axios
       .get("/api/board/id/" + id)
@@ -30,6 +31,7 @@ export function BoardEdit() {
     return <Spinner />;
   }
 
+  // ------------------------------ 수정버튼 클릭 로직 ------------------------------
   function handleUpdate() {
     axios
       .put("/api/board/edit", board)

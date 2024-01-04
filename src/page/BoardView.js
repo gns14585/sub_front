@@ -1,16 +1,13 @@
 import {
   Box,
   Button,
+  Center,
   Flex,
   FormControl,
   FormLabel,
   HStack,
   Image,
   Input,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -18,6 +15,7 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
+  Select,
   Spinner,
   Text,
   useDisclosure,
@@ -40,26 +38,19 @@ export function BoardView() {
   const navigate = useNavigate();
 
   const [details, setDetails] = useState([]);
-  const [selectedDetail, setSelectedDetail] = useState(null);
   const [selectedDetails, setSelectedDetails] = useState({});
+  const [selectedColor, setSelectedColor] = useState(""); // 선택한 색상을 관리하기 위한 상태
 
-  // ------------------------- 렌더링시 게시물 가져오기 -------------------------
+  // ------------------------------ 렌더링시 게시물 가져오기 ------------------------------
   useEffect(() => {
-    // ---------- 상세선택 ----------
-    axios
-      .get("/api/board/details/" + id)
-      .then((response) => {
-        setDetails(response.data);
-        console.log(response.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching details:", error);
-      })
-      .finally(() => console.log("끝"));
+    // ------------------------------ 상세선택 ------------------------------
+    axios.get("/api/board/details/" + id).then((response) => {
+      setDetails(response.data);
+    });
   }, [id]);
 
   useEffect(() => {
-    // ---------- 게시물 ----------
+    // ------------------------------ 게시물 ------------------------------
     axios
       .get("/api/board/id/" + id)
       .then((response) => setBoard(response.data));
@@ -69,7 +60,7 @@ export function BoardView() {
     return <Spinner />;
   }
 
-  // ------------------------- 게시물 삭제 로직 -------------------------
+  // ------------------------------ 게시물 삭제 로직 ------------------------------
   function handleDelete() {
     axios
       .delete("/api/board/remove/" + id)
@@ -85,17 +76,16 @@ export function BoardView() {
           description: "삭제 중 문제가 발생하였습니다.",
           status: "error",
         });
-        console.log(error);
       })
       .finally(() => onClose());
   }
 
-  // ------------------------- 가격 , 쉼표구분 -------------------------
+  // ------------------------------ 가격 ex) 1,000 ,로 구분지어 보여지게 처리 ------------------------------
   const formatPrice = (price) => {
     return new Intl.NumberFormat("ko-KR", { style: "decimal" }).format(price);
   };
 
-  // ------------------------- 수량마다 가격 변경로직 -------------------------
+  // ------------------------------ 수량마다 가격 증가 또는 감소 변경로직 ------------------------------
   const handleSelectDetail = (detail) => {
     const key = `${detail.color}-${detail.axis}-${detail.line}`;
     setSelectedDetails((prevDetails) => {
@@ -121,7 +111,7 @@ export function BoardView() {
     });
   };
 
-  // ------------------------- 수량 증가 로직 -------------------------
+  // ------------------------------ 수량 증가 로직 ------------------------------
   const increaseQuantity = (key) => {
     setSelectedDetails((prevDetails) => ({
       ...prevDetails,
@@ -132,7 +122,7 @@ export function BoardView() {
     }));
   };
 
-  // ------------------------- 수량 감소 로직 -------------------------
+  // ------------------------------ 수량 감소 로직 ------------------------------
   const decreaseQuantity = (key) => {
     setSelectedDetails((prevDetails) => {
       // 현재 항목의 수량 확인
@@ -155,7 +145,7 @@ export function BoardView() {
     });
   };
 
-  // ------------------------- 총 가격 계산 로직 -------------------------
+  // ------------------------------ 수량에 따라 총 가격 계산 로직 ------------------------------
   const calculateTotalPrice = () => {
     const total = Object.values(selectedDetails).reduce((total, detail) => {
       const price = detail.price || 0;
@@ -165,7 +155,7 @@ export function BoardView() {
     return formatPrice(total); // 총액 포매팅
   };
 
-  // ------------------------- 추가한 상품 삭제 로직 -------------------------
+  // ------------------------------ 추가한 상품 삭제 로직 ------------------------------
   const handleRemoveDetail = (key) => {
     setSelectedDetails((prevDetails) => {
       const { [key]: _, ...rest } = prevDetails;
@@ -176,6 +166,7 @@ export function BoardView() {
   return (
     <Box w="100%">
       <Box w="80%">
+        {/* ------------------------------ 상품 수정, 삭제 ------------------------------ */}
         <Button colorScheme="blue" onClick={() => navigate("/edit/" + id)}>
           수정
         </Button>
@@ -184,6 +175,16 @@ export function BoardView() {
         </Button>
       </Box>
 
+      {/* ------------------------------ 상품명 ------------------------------ */}
+      <Center mt={10} mb={10} w={"100%"} justifyContent={"center"}>
+        <Box w={"80%"}>
+          <Box fontSize={"1.5rem"} p={0} border={"none"}>
+            {board.title}
+          </Box>
+        </Box>
+      </Center>
+
+      {/* ------------------------------ 상품 이미지 ------------------------------ */}
       <Flex justifyContent="center" align="center">
         <Flex w={"80%"}>
           <Box w={"38%"}>
@@ -199,74 +200,87 @@ export function BoardView() {
             ))}
           </Box>
 
+          {/* ------------------------------ 이미지 옆 상품 기본 정보 ------------------------------ */}
           <VStack w="60%" ml={5}>
-            <FormControl>
-              <FormLabel fontWeight="bold">상품명</FormLabel>
-              <Box mt={-2} p={0} border={"none"}>
-                {board.title}
+            <HStack w={"100%"} h={"50px"} borderBottom={"1px solid #eeeeee"}>
+              <FormLabel w="100px" fontWeight="bold">
+                판매가
+              </FormLabel>
+              <Box
+                fontWeight={"bold"}
+                fontSize={"20px"}
+                mt={-2}
+                p={0}
+                border={"none"}
+                readOnly
+              >
+                {formatPrice(board.price)}원
               </Box>
-            </FormControl>
-            <FormControl>
-              <FormLabel fontWeight="bold">상품 설명</FormLabel>
+            </HStack>
+
+            <HStack w={"100%"} h={"50px"} borderBottom={"1px solid #eeeeee"}>
+              <FormLabel w="100px" fontWeight="bold">
+                상품 설명
+              </FormLabel>
               <Box mt={-2} p={0} border={"none"} readOnly>
                 {board.content}
               </Box>
-            </FormControl>
+            </HStack>
 
-            <FormControl>
-              <FormLabel fontWeight="bold">판매가</FormLabel>
-              <Box mt={-2} p={0} border={"none"} readOnly>
-                {formatPrice(board.price)}원
-              </Box>
-            </FormControl>
-            <FormControl>
-              <FormLabel fontWeight="bold">배송</FormLabel>
+            <HStack w={"100%"} h={"50px"} borderBottom={"1px solid #eeeeee"}>
+              <FormLabel w="100px" fontWeight="bold">
+                배송
+              </FormLabel>
               <Box mt={-2} p={0} border={"none"}>
                 무료배송
               </Box>
-            </FormControl>
+            </HStack>
 
-            {/* -------------------------- 상세선택 메뉴바 -------------------------- */}
+            {/* ------------------------------ 상세선택 메뉴바 ------------------------------ */}
+            {/* TODO : 현재 Select , Option 으로 처리했음 문제는 메뉴에 이미지가 안들어감 */}
+            {/* TODO : ChakraUI 의 Menu로 변경했을때 width 길이만 해결되면 코드변경예정 */}
+
             <Box w="100%">
               <Box w="100%" position="relative" mt={5}>
-                <Menu>
-                  <MenuButton
-                    h="70px"
-                    as={Button}
-                    colorScheme="gray"
-                    rightIcon={<ChevronDownIcon />}
-                    bg="none"
-                    border={"1px solid #eeeeee"}
-                    mb={5}
-                    mt={3}
-                    w="100%"
-                    _hover={{
-                      bg: "white",
+                <Box>
+                  <Select
+                    mb={10}
+                    h={"60px"}
+                    value={selectedColor}
+                    onChange={(e) => {
+                      setSelectedColor(e.target.value);
+                      const selected = details.find(
+                        (detail) =>
+                          `${detail.color}-${detail.axis}-${detail.line}` ===
+                          e.target.value,
+                      );
+                      if (selected) {
+                        handleSelectDetail(selected);
+                      }
                     }}
-                    _active={{
-                      bg: "white",
+                    style={{
+                      outline: "none",
+                      borderColor: "#eeeeee", // 테두리 색 변경해야 수량 증가 감소 버튼이 위 아래 margin 생김
+                      boxShadow: "none", // 기본 박스 그림자 제거
+                      borderRadius: "0",
                     }}
                   >
-                    {selectedDetail
-                      ? `색상: ${selectedDetail.color}, 축: ${selectedDetail.axis}, 선: ${selectedDetail.line}`
-                      : "상품을 선택하세요"}
-                  </MenuButton>
-                  <MenuList position={"absolute"} maxW="100%" w={"100%"}>
+                    <option>상품을 선택하세요</option>
                     {details.map((detail, index) => (
-                      <MenuItem
+                      <option
                         key={index}
-                        onClick={() => handleSelectDetail(detail)}
+                        value={`${detail.color}-${detail.axis}-${detail.line}`}
                       >
-                        색상: {detail.color}, 축: {detail.axis}, 선:{" "}
-                        {detail.line}
-                      </MenuItem>
+                        {`[${detail.color}/${detail.line}] ${detail.axis} `}
+                      </option>
                     ))}
-                  </MenuList>
-                </Menu>
+                  </Select>
+                </Box>
               </Box>
               <Box>
+                {/* ------------------------------ 상품 선택시 목록 보이기 ------------------------------ */}
                 {Object.entries(selectedDetails).map(([key, detail], index) => (
-                  <Box bg="#F9F9F9" border={"1px solid #F9F9F9"}>
+                  <Box bg="#F9F9F9" border={"1px solid #F9F9F9"} key={key}>
                     <Box
                       border={"none"}
                       key={index}
@@ -310,7 +324,7 @@ export function BoardView() {
                       >
                         <ChevronUpIcon />
                       </Button>
-                      <Box>{detail.quantity}</Box>
+                      <Box fontSize={"13px"}>{detail.quantity}</Box>
                       <Button
                         size={"xs"}
                         bg={"none"}
@@ -340,6 +354,38 @@ export function BoardView() {
                       <span style={{ fontSize: "18px" }}>원</span>
                     </Text>
                   </Box>
+                </Box>
+
+                <Box mt={10}>
+                  <Button
+                    h={"50px"}
+                    w={"20%"}
+                    bg={"none"}
+                    borderRadius={0}
+                    border={"1px solid #eeeeee"}
+                  >
+                    찜하기
+                  </Button>
+                  <Button
+                    h={"50px"}
+                    w={"30%"}
+                    borderRadius={0}
+                    bg={"none"}
+                    border={"1px solid #eeeeee"}
+                  >
+                    장바구니
+                  </Button>
+                  <Button
+                    h={"50px"}
+                    w={"50%"}
+                    borderRadius={0}
+                    bg={"black"}
+                    color={"white"}
+                    border={"1px solid #eeeeee"}
+                    _hover={{ color: "black", background: "gray.300" }}
+                  >
+                    구매하기
+                  </Button>
                 </Box>
               </Box>
             </Box>
