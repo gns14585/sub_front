@@ -85,7 +85,7 @@ export function BoardView() {
     return new Intl.NumberFormat("ko-KR", { style: "decimal" }).format(price);
   };
 
-  // ------------------------------ 수량마다 가격 증가 또는 감소 변경로직 ------------------------------
+  // ------------------------------ 상세선택 메뉴 상품 클릭시 상품목록 실행 로직 ------------------------------
   const handleSelectDetail = (detail) => {
     const key = `${detail.color}-${detail.axis}-${detail.line}`;
     setSelectedDetails((prevDetails) => {
@@ -155,7 +155,7 @@ export function BoardView() {
     return formatPrice(total); // 총액 포매팅
   };
 
-  // ------------------------------ 추가한 상품 삭제 로직 ------------------------------
+  // ------------------------------ 목록에있는 상품 삭제 로직 ------------------------------
   const handleRemoveDetail = (key) => {
     setSelectedDetails((prevDetails) => {
       const { [key]: _, ...rest } = prevDetails;

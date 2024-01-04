@@ -57,6 +57,7 @@ export function BoardList() {
                   alt="Board Image"
                 />
               )}
+              <Box>{board.id}</Box>
               <Box color={"gray"} fontSize={"12px"}>
                 {board.title}
               </Box>
