@@ -25,7 +25,12 @@ import {
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
+import {
+  ChevronDownIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  ChevronUpIcon,
+} from "@chakra-ui/icons";
 
 export function BoardView() {
   const [board, setBoard] = useState(null);
@@ -39,7 +44,9 @@ export function BoardView() {
 
   const [details, setDetails] = useState([]);
   const [selectedDetails, setSelectedDetails] = useState({});
-  const [selectedColor, setSelectedColor] = useState(""); // 선택한 색상을 관리하기 위한 상태
+  const [selectedColor, setSelectedColor] = useState("");
+
+  const [currentImageIndex, setCurrentImageIndex] = useState(0); // 이미지 슬라이드용 상태
 
   // ------------------------------ 렌더링시 게시물 가져오기 ------------------------------
   useEffect(() => {
@@ -87,7 +94,7 @@ export function BoardView() {
 
   // ------------------------------ 상세선택 메뉴 상품 클릭시 상품목록 실행 로직 ------------------------------
   const handleSelectDetail = (detail) => {
-    const key = `${detail.color}-${detail.axis}-${detail.line}`;
+    const key = `${detail.color}-${detail.axis}-${detail.line}-${detail.inch}`;
     setSelectedDetails((prevDetails) => {
       const existingDetail = prevDetails[key];
       if (existingDetail) {
@@ -163,6 +170,11 @@ export function BoardView() {
     });
   };
 
+  // ------------------------------ 썸네일 클릭 시 메인 이미지 변경 ------------------------------
+  const selectImage = (index) => {
+    setCurrentImageIndex(index);
+  };
+
   return (
     <Box w="100%">
       <Box w="80%">
@@ -187,17 +199,41 @@ export function BoardView() {
       {/* ------------------------------ 상품 이미지 ------------------------------ */}
       <Flex justifyContent="center" align="center">
         <Flex w={"80%"}>
-          <Box w={"38%"}>
-            {board.mainImgs.map((mainImg) => (
-              <Box
-                key={mainImg.id}
-                my="5px"
-                w="100%"
-                border={"1px solid #eeeeee"}
-              >
-                <Image w="100%" src={mainImg.url} alt={mainImg.name} />
-              </Box>
-            ))}
+          <Box
+            w={"38%"}
+            h={"400px"}
+            position="relative"
+            border={"1px solid red"}
+          >
+            {board.mainImgs.length > 0 && (
+              <>
+                <Image
+                  key={board.mainImgs[currentImageIndex].id}
+                  w="100%"
+                  h={"100%"}
+                  src={board.mainImgs[currentImageIndex].url}
+                  alt={board.mainImgs[currentImageIndex].name}
+                />
+
+                {/* 이미지 썸네일 */}
+                <HStack justifyContent={"center"} spacing={2} mt={2}>
+                  {board.mainImgs.map((img, index) => (
+                    <Box
+                      mt={4}
+                      _hover={{ cursor: "pointer" }}
+                      key={img.id}
+                      boxSize="80px"
+                      border={
+                        currentImageIndex === index ? "1px solid gray" : "none"
+                      }
+                      onClick={() => selectImage(index)}
+                    >
+                      <Image src={img.url} alt={`thumbnail-${index}`} />
+                    </Box>
+                  ))}
+                </HStack>
+              </>
+            )}
           </Box>
 
           {/* ------------------------------ 이미지 옆 상품 기본 정보 ------------------------------ */}
@@ -229,6 +265,15 @@ export function BoardView() {
 
             <HStack w={"100%"} h={"50px"} borderBottom={"1px solid #eeeeee"}>
               <FormLabel w="100px" fontWeight="bold">
+                제조사
+              </FormLabel>
+              <Box mt={-2} p={0} border={"none"} readOnly>
+                {board.manufacturer}
+              </Box>
+            </HStack>
+
+            <HStack w={"100%"} h={"50px"} borderBottom={"1px solid #eeeeee"}>
+              <FormLabel w="100px" fontWeight="bold">
                 배송
               </FormLabel>
               <Box mt={-2} p={0} border={"none"}>
@@ -251,7 +296,7 @@ export function BoardView() {
                       setSelectedColor(e.target.value);
                       const selected = details.find(
                         (detail) =>
-                          `${detail.color}-${detail.axis}-${detail.line}` ===
+                          `${detail.color}-${detail.axis}-${detail.line}-${detail.inch}` ===
                           e.target.value,
                       );
                       if (selected) {
@@ -269,9 +314,9 @@ export function BoardView() {
                     {details.map((detail, index) => (
                       <option
                         key={index}
-                        value={`${detail.color}-${detail.axis}-${detail.line}`}
+                        value={`${detail.color}-${detail.axis}-${detail.line}-${detail.inch}`}
                       >
-                        {`[${detail.color}/${detail.line}] ${detail.axis} `}
+                        {`[${detail.color}/${detail.line}] ${detail.axis} ${detail.inch} `}
                       </option>
                     ))}
                   </Select>
@@ -292,8 +337,8 @@ export function BoardView() {
                       justifyContent={"space-between"}
                     >
                       <Text fontSize={"15px"} flex="1">
-                        {board.title} {detail.axis}, [{detail.color}/
-                        {detail.line}]
+                        {board.title} {detail.axis}, [{detail.color}{" "}
+                        {detail.inch}/{detail.line}]
                       </Text>
                       <Button
                         size={"sm"}
@@ -393,7 +438,7 @@ export function BoardView() {
         </Flex>
       </Flex>
 
-      <Box mt={10}>
+      <Box mt={40}>
         <Text fontWeight="bold" fontSize="30px">
           상품 사용 후기
         </Text>
