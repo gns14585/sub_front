@@ -57,6 +57,7 @@ export function BoardEdit() {
         title: board.title,
         content: board.content,
         price: board.price,
+        manufacturer: board.manufacturer,
         removeMainImgs,
         mainImg,
       })
