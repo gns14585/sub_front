@@ -30,19 +30,17 @@ export function BoardEdit() {
 
   const [details, setDetails] = useState([]); // 상세선택 배열 상태
 
-  // ------------------------------ 상품 클릭시 상품 렌더링 ------------------------------
+  const [newDetails, setNewDetails] = useState([]);
+
   useEffect(() => {
+    // ---------------------------- 상품 렌더링 로직 ----------------------------
     axios
       .get("/api/board/id/" + id)
       .then((response) => setBoard(response.data));
-  }, [id]);
-
-  // ------------------------------ 상세선택 렌더링 ------------------------------
-  useEffect(() => {
-    axios.get("/api/board/details/" + id).then((response) => {
-      console.log(response.data);
-      setDetails(response.data);
-    });
+    // ---------------------------- 상품 상세항목 렌더링 로직 ----------------------------
+    axios
+      .get("/api/board/details/" + id)
+      .then((response) => setDetails(response.data));
   }, [id]);
 
   if (board === null) {
@@ -65,6 +63,17 @@ export function BoardEdit() {
         // ------------------- 상품 등록할 때 처럼 상세등록 정보도 따로 보내기 -------------------
         return axios.put("/api/board/updateDetails", details);
       })
+
+      // ----------------------- 상품 등록시 상세항목 추가 안한 상품 수정할때 상세항목 추가 가능하도록 -----------------------
+      // .then(() => {
+      //   // 새로운 상세 정보가 있다면 추가 요청
+      //   if (newDetails.length > 0) {
+      //     return axios.post("/api/board/addList", {
+      //       boardId: id,
+      //       newDetails,
+      //     });
+      //   }
+      // })
       .then(() => {
         toast({
           description: id + "번 상품 수정 되었습니다.",
@@ -80,6 +89,7 @@ export function BoardEdit() {
       });
   }
 
+  // ------------------------------ 메인이미지 삭제 로직 ------------------------------
   function handleRemoveMainImgSwitch(mainImgId) {
     setBoard((prevBoard) => ({
       ...prevBoard,
@@ -88,11 +98,23 @@ export function BoardEdit() {
     setRemoveMainImgs((prev) => [...prev, mainImgId]);
   }
 
+  // ------------------------------ 상세선택 수정 로직 ------------------------------
   const handleDetailChange = (index, field, value) => {
     const updatedDetails = [...details];
     updatedDetails[index] = { ...updatedDetails[index], [field]: value };
     setDetails(updatedDetails);
   };
+
+  // ----------------------- 상품 등록시 상세항목 추가 안한 상품 수정할때 상세항목 추가 가능하도록 -----------------------
+  // const handleNewDetailChange = (index, field, value) => {
+  //   const updatedNewDetails = [...newDetails];
+  //   updatedNewDetails[index] = { ...updatedNewDetails[index], [field]: value };
+  //   setNewDetails(updatedNewDetails);
+  // };
+  //
+  // const handleAddNewDetail = () => {
+  //   setNewDetails([...newDetails, { color: "", axis: "", line: "", inch: "" }]);
+  // };
 
   return (
     <Box>
@@ -210,6 +232,24 @@ export function BoardEdit() {
               />
             </FormControl>
           )}
+
+          {/* 상품 등록 시 상세항목 추가 안했을경우 수정할때 안나오는데, 나오게 작업중 */}
+          {/*{newDetails.map((detail, index) => (*/}
+          {/*  <Flex key={index} my={2}>*/}
+          {/*    /!* 새로운 상세 정보 입력 필드 *!/*/}
+          {/*    <FormControl>*/}
+          {/*      <FormLabel>색상</FormLabel>*/}
+          {/*      <Input*/}
+          {/*        value={detail.color}*/}
+          {/*        onChange={(e) =>*/}
+          {/*          handleNewDetailChange(index, "color", e.target.value)*/}
+          {/*        }*/}
+          {/*      />*/}
+          {/*    </FormControl>*/}
+          {/*    /!* 다른 필드들도 이와 유사한 방식으로 추가 *!/*/}
+          {/*    /!* 예: axis, line, inch 등 *!/*/}
+          {/*  </Flex>*/}
+          {/*))}*/}
         </Flex>
       ))}
 

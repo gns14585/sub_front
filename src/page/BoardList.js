@@ -27,8 +27,8 @@ export function BoardList() {
 
   return (
     <Box justifyContent={"center"} w="100%">
+      <Box>게시물 목록</Box>
       <Flex w="80%" justifyContent={"center"} display={"flex"}>
-        <h1>게시물 목록</h1>
         <SimpleGrid columns={3} spacing={9} m={20}>
           {boardList.map((board) => (
             <Box

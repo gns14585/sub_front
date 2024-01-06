@@ -25,12 +25,13 @@ import {
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  ChevronDownIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  ChevronUpIcon,
-} from "@chakra-ui/icons";
+  faCartShopping,
+  faHeart as fasHeart,
+} from "@fortawesome/free-solid-svg-icons"; // 꽉 찬 하트
+import { faHeart as farHeart } from "@fortawesome/free-regular-svg-icons"; // 빈 하트
 
 export function BoardView() {
   const [board, setBoard] = useState(null);
@@ -47,6 +48,8 @@ export function BoardView() {
   const [selectedColor, setSelectedColor] = useState("");
 
   const [currentImageIndex, setCurrentImageIndex] = useState(0); // 이미지 슬라이드용 상태
+
+  const [isFavorited, setIsFavorited] = useState(false); // 찜하기 상태
 
   // ------------------------------ 렌더링시 게시물 가져오기 ------------------------------
   useEffect(() => {
@@ -175,6 +178,13 @@ export function BoardView() {
     setCurrentImageIndex(index);
   };
 
+  function handleLikeClick() {
+    axios
+      .get("/api/board/like")
+      .then((response) => console.log(response))
+      .catch((error) => console.log(error));
+  }
+
   return (
     <Box w="100%">
       <Box w="80%">
@@ -262,7 +272,7 @@ export function BoardView() {
             </HStack>
 
             <HStack w={"100%"} h={"50px"} borderBottom={"1px solid #eeeeee"}>
-              <FormLabel w="110px" fontWeight="bold">
+              <FormLabel w="100px" fontWeight="bold">
                 상품 설명
               </FormLabel>
               <Box mt={-2} border={"none"} fontWeight={"400"} readOnly>
@@ -343,10 +353,13 @@ export function BoardView() {
                       alignItems="center"
                       justifyContent={"space-between"}
                     >
+                      {/* ------------------- 상품 목록 ------------------- */}
                       <Text fontSize={"15px"} flex="1">
                         {board.title} {detail.axis}, [{detail.color}{" "}
                         {detail.inch}/{detail.line}]
                       </Text>
+
+                      {/* ------------------- 목록상품 삭제 버튼 ------------------- */}
                       <Button
                         size={"sm"}
                         onClick={() => handleRemoveDetail(key)}
@@ -364,6 +377,7 @@ export function BoardView() {
                       bg={"white"}
                       m={3}
                     >
+                      {/* ------------------- 수량 증가 버튼 ------------------- */}
                       <Button
                         size={"xs"}
                         bg={"none"}
@@ -376,7 +390,11 @@ export function BoardView() {
                       >
                         <ChevronUpIcon />
                       </Button>
+
+                      {/* ------------------- 수량 ------------------- */}
                       <Box fontSize={"13px"}>{detail.quantity}</Box>
+
+                      {/* ------------------- 수량 감소 버튼 ------------------- */}
                       <Button
                         size={"xs"}
                         bg={"none"}
@@ -409,14 +427,19 @@ export function BoardView() {
                 </Box>
 
                 <Box mt={10}>
+                  {/* --------------- 찜하기 --------------- */}
                   <Button
                     h={"50px"}
                     w={"20%"}
                     bg={"none"}
                     borderRadius={0}
                     border={"1px solid #eeeeee"}
+                    onClick={() => setIsFavorited(!isFavorited)} // 클릭 시 상태 토글
                   >
-                    찜하기
+                    <FontAwesomeIcon
+                      onClick={handleLikeClick}
+                      icon={isFavorited ? fasHeart : farHeart}
+                    />
                   </Button>
                   <Button
                     h={"50px"}
@@ -425,7 +448,7 @@ export function BoardView() {
                     bg={"none"}
                     border={"1px solid #eeeeee"}
                   >
-                    장바구니
+                    <FontAwesomeIcon icon={faCartShopping} />
                   </Button>
                   <Button
                     h={"50px"}
