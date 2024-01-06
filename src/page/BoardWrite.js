@@ -20,27 +20,27 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 export function BoardWrite() {
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-  const [price, setPrice] = useState("");
-  const [manufacturer, setManufacturer] = useState("");
+  const [title, setTitle] = useState(""); // 제목
+  const [content, setContent] = useState(""); // 상품설명
+  const [price, setPrice] = useState(""); // 금액
+  const [manufacturer, setManufacturer] = useState(""); // 제조사
 
   const toast = useToast();
-  const [mainImg, setMainImg] = useState(null);
+  const [mainImg, setMainImg] = useState(null); // 메인이미지
 
-  const [color, setColor] = useState("");
-  const [axis, setAxis] = useState("");
-  const [line, setLine] = useState("");
-  const [inch, setInch] = useState("");
+  const [color, setColor] = useState(""); // 상세선택 컬러
+  const [axis, setAxis] = useState(""); // 상세선택 축
+  const [line, setLine] = useState(""); // 상세선택 선 유무
+  const [inch, setInch] = useState(""); // 상세선택 인치
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false); // 더블클릭 방지
 
   const navigate = useNavigate();
-  const [details, setDetails] = useState([]);
+  const [details, setDetails] = useState([]); // 상세선택 배열 상태
 
-  const [productType, setProductType] = useState("");
+  const [productType, setProductType] = useState(""); // 상품 타입
 
-  // ------------------------------ 저장버튼 클릭 로직 ------------------------------
+  // ------------------------------ 저장버튼 클릭시 상품 저장 로직 ------------------------------
   function handleSubmit() {
     setIsSubmitting(true);
     // 상품 저장 로직

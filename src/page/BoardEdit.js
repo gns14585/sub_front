@@ -25,10 +25,10 @@ export function BoardEdit() {
 
   const toast = useToast();
 
-  const [removeMainImgs, setRemoveMainImgs] = useState([]);
-  const [mainImg, setMainImg] = useState(null);
+  const [removeMainImgs, setRemoveMainImgs] = useState([]); // 이미지 삭제
+  const [mainImg, setMainImg] = useState(null); // 이미지 추가
 
-  const [details, setDetails] = useState([]);
+  const [details, setDetails] = useState([]); // 상세선택 배열 상태
 
   // ------------------------------ 상품 클릭시 상품 렌더링 ------------------------------
   useEffect(() => {
@@ -62,6 +62,10 @@ export function BoardEdit() {
         mainImg,
       })
       .then(() => {
+        // ------------------- 상품 등록할 때 처럼 상세등록 정보도 따로 보내기 -------------------
+        return axios.put("/api/board/updateDetails", details);
+      })
+      .then(() => {
         toast({
           description: id + "번 상품 수정 되었습니다.",
           status: "success",
@@ -85,15 +89,9 @@ export function BoardEdit() {
   }
 
   const handleDetailChange = (index, field, value) => {
-    // 'details' 배열의 깊은 복사본을 생성합니다.
     const updatedDetails = [...details];
-
-    // 'details' 배열의 특정 인덱스에 있는 객체를 업데이트합니다.
     updatedDetails[index] = { ...updatedDetails[index], [field]: value };
-
-    // 업데이트된 배열로 'setDetails' 상태를 업데이트합니다.
     setDetails(updatedDetails);
-    console.log(updatedDetails);
   };
 
   return (
@@ -165,7 +163,7 @@ export function BoardEdit() {
 
       {details.map((detail, index) => (
         <Flex key={index} my={2}>
-          {detail.color > 0 && (
+          {detail.color && (
             <FormControl>
               <FormLabel>색상</FormLabel>
               <Input

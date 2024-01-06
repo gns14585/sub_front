@@ -42,8 +42,8 @@ export function BoardView() {
   const toast = useToast();
   const navigate = useNavigate();
 
-  const [details, setDetails] = useState([]);
-  const [selectedDetails, setSelectedDetails] = useState({});
+  const [details, setDetails] = useState([]); // 상세선택 배열 상태
+  const [selectedDetails, setSelectedDetails] = useState({}); // 상세선택 목록 상태
   const [selectedColor, setSelectedColor] = useState("");
 
   const [currentImageIndex, setCurrentImageIndex] = useState(0); // 이미지 슬라이드용 상태
@@ -191,7 +191,7 @@ export function BoardView() {
       <Center mt={10} mb={10} w={"100%"} justifyContent={"center"}>
         <Box w={"80%"}>
           <Box fontSize={"1.5rem"} p={0} border={"none"}>
-            {board.title}
+            <Text>{board.title}</Text>
           </Box>
         </Box>
       </Center>
@@ -199,36 +199,44 @@ export function BoardView() {
       {/* ------------------------------ 상품 이미지 ------------------------------ */}
       <Flex justifyContent="center" align="center">
         <Flex w={"80%"}>
-          <Box
-            w={"38%"}
-            h={"400px"}
-            position="relative"
-            border={"1px solid red"}
-          >
+          <Box w={"38%"} h={"400px"} position="relative">
             {board.mainImgs.length > 0 && (
               <>
-                <Image
-                  key={board.mainImgs[currentImageIndex].id}
+                {/* 메인 이미지 */}
+                <Box
                   w="100%"
-                  h={"100%"}
-                  src={board.mainImgs[currentImageIndex].url}
-                  alt={board.mainImgs[currentImageIndex].name}
-                />
+                  h="100%"
+                  bg="gray.200"
+                  position="relative"
+                  overflow="hidden"
+                >
+                  <Image
+                    key={board.mainImgs[currentImageIndex].id}
+                    src={board.mainImgs[currentImageIndex].url}
+                    alt={board.mainImgs[currentImageIndex].name}
+                    objectFit="cover"
+                    w="100%"
+                    h="100%"
+                  />
+                </Box>
 
                 {/* 이미지 썸네일 */}
                 <HStack justifyContent={"center"} spacing={2} mt={2}>
                   {board.mainImgs.map((img, index) => (
                     <Box
-                      mt={4}
-                      _hover={{ cursor: "pointer" }}
                       key={img.id}
                       boxSize="80px"
-                      border={
-                        currentImageIndex === index ? "1px solid gray" : "none"
-                      }
-                      onClick={() => selectImage(index)}
+                      bg="gray.100"
+                      overflow="hidden" // 이미지가 박스를 넘어가지 않도록 설정
+                      onMouseEnter={() => selectImage(index)} // 마우스 호버 시 이미지 변경
                     >
-                      <Image src={img.url} alt={`thumbnail-${index}`} />
+                      <Image
+                        src={img.url}
+                        alt={`thumbnail-${index}`}
+                        objectFit="cover" // 컨테이너에 맞게 이미지를 조절
+                        w="100%"
+                        h="100%"
+                      />
                     </Box>
                   ))}
                 </HStack>
@@ -246,7 +254,6 @@ export function BoardView() {
                 fontWeight={"bold"}
                 fontSize={"20px"}
                 mt={-2}
-                p={0}
                 border={"none"}
                 readOnly
               >
@@ -255,10 +262,10 @@ export function BoardView() {
             </HStack>
 
             <HStack w={"100%"} h={"50px"} borderBottom={"1px solid #eeeeee"}>
-              <FormLabel w="100px" fontWeight="bold">
+              <FormLabel w="110px" fontWeight="bold">
                 상품 설명
               </FormLabel>
-              <Box mt={-2} p={0} border={"none"} readOnly>
+              <Box mt={-2} border={"none"} fontWeight={"400"} readOnly>
                 {board.content}
               </Box>
             </HStack>
@@ -267,7 +274,7 @@ export function BoardView() {
               <FormLabel w="100px" fontWeight="bold">
                 제조사
               </FormLabel>
-              <Box mt={-2} p={0} border={"none"} readOnly>
+              <Box mt={-2} border={"none"} fontWeight={"400"} readOnly>
                 {board.manufacturer}
               </Box>
             </HStack>
@@ -276,7 +283,7 @@ export function BoardView() {
               <FormLabel w="100px" fontWeight="bold">
                 배송
               </FormLabel>
-              <Box mt={-2} p={0} border={"none"}>
+              <Box mt={-2} border={"none"} fontWeight={"400"}>
                 무료배송
               </Box>
             </HStack>
