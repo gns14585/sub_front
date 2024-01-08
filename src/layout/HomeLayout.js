@@ -4,7 +4,7 @@ import { NavBar } from "../component/NavBar";
 
 export function HomeLayout() {
   return (
-    <Box>
+    <Box fontWeight={"700"} fontFamily={"Pretendard-Regular"}>
       <NavBar />
       <Outlet />
     </Box>
