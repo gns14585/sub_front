@@ -101,21 +101,22 @@ export function BoardView() {
     setSelectedDetails((prevDetails) => {
       const existingDetail = prevDetails[key];
       if (existingDetail) {
+        // 이미 선택된 상세항목의 수량만 증가
         return {
           ...prevDetails,
           [key]: {
             ...existingDetail,
             quantity: existingDetail.quantity + 1,
-            price: board.price,
           },
         };
       }
+      // 새로운 상세항목을 선택하면, 해당 항목의 가격으로 설정
       return {
         ...prevDetails,
         [key]: {
           ...detail,
           quantity: 1,
-          price: board.price,
+          price: detail.price || board.price, // 상세선택이 있으면 해당 가격을, 없으면 기본 판매가를 사용
         },
       };
     });
@@ -157,12 +158,19 @@ export function BoardView() {
 
   // ------------------------------ 수량에 따라 총 가격 계산 로직 ------------------------------
   const calculateTotalPrice = () => {
-    const total = Object.values(selectedDetails).reduce((total, detail) => {
-      const price = detail.price || 0;
-      return total + price * detail.quantity;
-    }, 0);
-
-    return formatPrice(total); // 총액 포매팅
+    // 상세선택이 없을 경우, 기본 판매가 반환
+    if (Object.keys(selectedDetails).length === 0) {
+      return formatPrice(board.price);
+    }
+    // 상세선택이 있을 경우, 각 상세선택에 대한 추가 가격을 계산
+    const additionalPrice = Object.values(selectedDetails).reduce(
+      (total, detail) => {
+        return total + (detail.price || 0) * detail.quantity;
+      },
+      0,
+    );
+    // 상세선택이 있으면 추가 가격을, 없으면 기본 판매가를 반환
+    return formatPrice(additionalPrice);
   };
 
   // ------------------------------ 목록에있는 상품 삭제 로직 ------------------------------
@@ -274,11 +282,11 @@ export function BoardView() {
               </Box>
             </HStack>
 
-            <HStack w={"100%"} h={"50px"} borderBottom={"1px solid #eeeeee"}>
+            <HStack w={"100%"} h={"auto"} borderBottom={"1px solid #eeeeee"}>
               <FormLabel w="100px" fontWeight="bold">
                 상품 설명
               </FormLabel>
-              <Box flex={1} mt={-2} fontWeight={"400"} border={"none"} readOnly>
+              <Box flex={1} mb={2} fontWeight={"400"} readOnly>
                 {board.content}
               </Box>
             </HStack>
@@ -306,113 +314,118 @@ export function BoardView() {
             {/* TODO : ChakraUI 의 Menu로 변경했을때 width 길이만 해결되면 코드변경예정 */}
 
             <Box w="100%">
-              <Box w="100%" position="relative" mt={5}>
-                <Box>
-                  <Select
-                    mb={10}
-                    h={"60px"}
-                    value={selectedColor}
-                    onChange={(e) => {
-                      setSelectedColor(e.target.value);
-                      const selected = details.find(
-                        (detail) =>
-                          `${detail.color}-${detail.axis}-${detail.line}-${detail.inch}` ===
-                          e.target.value,
-                      );
-                      if (selected) {
-                        handleSelectDetail(selected);
-                      }
-                    }}
-                    style={{
-                      outline: "none",
-                      borderColor: "#eeeeee", // 테두리 색 변경해야 수량 증가 감소 버튼이 위 아래 margin 생김
-                      boxShadow: "none", // 기본 박스 그림자 제거
-                      borderRadius: "0",
-                    }}
-                  >
-                    <option>상품을 선택하세요</option>
-                    {details.map((detail, index) => (
-                      <option
-                        key={index}
-                        value={`${detail.color}-${detail.axis}-${detail.line}-${detail.inch}`}
-                      >
-                        {`[${detail.color}/${detail.line}] ${detail.axis} ${detail.inch} `}
-                      </option>
-                    ))}
-                  </Select>
+              {details.length > 0 && (
+                <Box w="100%" position="relative" mt={5}>
+                  <Box>
+                    <Select
+                      mb={10}
+                      h={"60px"}
+                      value={selectedColor}
+                      onChange={(e) => {
+                        setSelectedColor(e.target.value);
+                        const selected = details.find(
+                          (detail) =>
+                            `${detail.color}-${detail.axis}-${detail.line}-${detail.inch}` ===
+                            e.target.value,
+                        );
+                        if (selected) {
+                          handleSelectDetail(selected);
+                        }
+                      }}
+                      style={{
+                        outline: "none",
+                        borderColor: "#eeeeee",
+                        boxShadow: "none",
+                        borderRadius: "0",
+                      }}
+                    >
+                      {details.length > 0 && <option>상품을 선택하세요</option>}
+                      {details.map((detail, index) => (
+                        <option
+                          key={index}
+                          value={`${detail.color}-${detail.axis}-${detail.line}-${detail.inch}`}
+                        >
+                          {`[${detail.color}/${detail.line}] ${detail.axis} ${detail.inch} `}
+                        </option>
+                      ))}
+                    </Select>
+                  </Box>
                 </Box>
-              </Box>
+              )}
               <Box>
                 {/* ------------------------------ 상품 선택시 목록 보이기 ------------------------------ */}
-                {Object.entries(selectedDetails).map(([key, detail], index) => (
-                  <Box bg="#F9F9F9" border={"1px solid #F9F9F9"} key={key}>
-                    <Box
-                      border={"none"}
-                      key={index}
-                      p={4}
-                      borderWidth="1px"
-                      mt={2}
-                      display="flex"
-                      alignItems="center"
-                      justifyContent={"space-between"}
-                    >
-                      {/* ------------------- 상품 목록 ------------------- */}
-                      <Text fontSize={"15px"} flex="1">
-                        {board.title} {detail.axis}, [{detail.color}{" "}
-                        {detail.inch}/{detail.line}]
-                      </Text>
+                {Object.keys(selectedDetails).length > 0 &&
+                  Object.entries(selectedDetails).map(
+                    ([key, detail], index) => (
+                      <Box bg="#F9F9F9" border={"1px solid #F9F9F9"} key={key}>
+                        <Box
+                          border={"none"}
+                          key={index}
+                          p={4}
+                          borderWidth="1px"
+                          mt={2}
+                          display="flex"
+                          alignItems="center"
+                          justifyContent={"space-between"}
+                        >
+                          {/* ------------------- 상품 목록 ------------------- */}
+                          <Text fontSize={"15px"} flex="1">
+                            {board.title} {detail.axis}, [{detail.color}{" "}
+                            {detail.inch}/{detail.line}]
+                          </Text>
 
-                      {/* ------------------- 목록상품 삭제 버튼 ------------------- */}
-                      <Button
-                        size={"sm"}
-                        onClick={() => handleRemoveDetail(key)}
-                        bg={"none"}
-                        _hover={{ cursor: "background: none" }}
-                        _active={{ bg: "none" }}
-                      >
-                        X
-                      </Button>
-                    </Box>
-                    <HStack
-                      w={"74px"}
-                      border={"1px solid gray"}
-                      borderRadius={"10px"}
-                      bg={"white"}
-                      m={3}
-                    >
-                      {/* ------------------- 수량 증가 버튼 ------------------- */}
-                      <Button
-                        size={"xs"}
-                        bg={"none"}
-                        borderRight={"1px solid gray"}
-                        borderRadius={0}
-                        p={0}
-                        onClick={() => increaseQuantity(key)}
-                        _hover={{ bg: "none" }}
-                        _active={{ bg: "none" }}
-                      >
-                        <ChevronUpIcon />
-                      </Button>
+                          {/* ------------------- 목록상품 삭제 버튼 ------------------- */}
+                          <Button
+                            size={"sm"}
+                            onClick={() => handleRemoveDetail(key)}
+                            bg={"none"}
+                            _hover={{ cursor: "background: none" }}
+                            _active={{ bg: "none" }}
+                          >
+                            X
+                          </Button>
+                        </Box>
+                        <HStack
+                          w={"74px"}
+                          border={"1px solid gray"}
+                          borderRadius={"10px"}
+                          bg={"white"}
+                          m={3}
+                        >
+                          {/* ------------------- 수량 증가 버튼 ------------------- */}
+                          <Button
+                            size={"xs"}
+                            bg={"none"}
+                            borderRight={"1px solid gray"}
+                            borderRadius={0}
+                            p={0}
+                            onClick={() => increaseQuantity(key)}
+                            _hover={{ bg: "none" }}
+                            _active={{ bg: "none" }}
+                          >
+                            <ChevronUpIcon />
+                          </Button>
 
-                      {/* ------------------- 수량 ------------------- */}
-                      <Box fontSize={"13px"}>{detail.quantity}</Box>
+                          {/* ------------------- 수량 ------------------- */}
+                          <Box fontSize={"13px"}>{detail.quantity}</Box>
 
-                      {/* ------------------- 수량 감소 버튼 ------------------- */}
-                      <Button
-                        size={"xs"}
-                        bg={"none"}
-                        borderLeft={"1px solid gray"}
-                        borderRadius={0}
-                        p={0}
-                        onClick={() => decreaseQuantity(key)}
-                        _hover={{ bg: "none" }}
-                        _active={{ bg: "none" }}
-                      >
-                        <ChevronDownIcon />
-                      </Button>
-                    </HStack>
-                  </Box>
-                ))}
+                          {/* ------------------- 수량 감소 버튼 ------------------- */}
+                          <Button
+                            size={"xs"}
+                            bg={"none"}
+                            borderLeft={"1px solid gray"}
+                            borderRadius={0}
+                            p={0}
+                            onClick={() => decreaseQuantity(key)}
+                            _hover={{ bg: "none" }}
+                            _active={{ bg: "none" }}
+                          >
+                            <ChevronDownIcon />
+                          </Button>
+                        </HStack>
+                      </Box>
+                    ),
+                  )}
                 <Box mt={10} textAlign={"end"}>
                   <Box textAlign={"end"}>
                     <Text color={"gray"}>총 합계 금액</Text>

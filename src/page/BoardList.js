@@ -40,7 +40,6 @@ export function BoardList() {
                 boxShadow="md"
                 _hover={{
                   cursor: "pointer",
-                  bg: "gray.100",
                   transform: "scale(1.05)",
                   transition: "transform 0.2s",
                 }}
@@ -50,28 +49,45 @@ export function BoardList() {
                 alignItems={"center"}
                 h={"530px"}
               >
-                <Box p={5} height="350px" width="100%" bg="white">
+                <Box
+                  position="relative" // 상대 위치 설정
+                  p={5}
+                  height="350px"
+                  width="100%"
+                  bg="white"
+                  display={"flex"}
+                  justifyContent={"center"}
+                  alignItems={"center"}
+                >
                   {/* 마우스 호버 시 2번째 이미지로 변경 */}
+                  {/* 기본 이미지 */}
                   <Image
-                    src={
-                      board.id === hoveredBoardId && board.mainImgs.length > 1
-                        ? board.mainImgs[1].url // 호버 시 2번째 이미지
-                        : board.mainImgs[0].url // 기본은 첫 번째 이미지
-                    }
+                    position="absolute"
+                    src={board.mainImgs[0]?.url}
                     alt="Board Image"
-                    objectFit="cover"
                     width="100%"
-                    height="350px" // "cover" 대신 적절한 높이 값 지정
-                    opacity={1} // 호버 시 이미지 강조
+                    height="350px"
+                    zIndex={1}
+                    transition="opacity 0.5s ease-in-out" // 부드러운 투명도 변화
+                    opacity={board.id === hoveredBoardId ? 0 : 1} // 호버 상태에 따른 투명도
+                  />
+                  {/* 호버 시 이미지 */}
+                  <Image
+                    position="absolute"
+                    src={board.mainImgs[1]?.url}
+                    alt="Hover Image"
+                    width="100%"
+                    height="350px"
+                    zIndex={2}
+                    transition="opacity 0.5s ease-in-out" // 부드러운 투명도 변화
+                    opacity={board.id === hoveredBoardId ? 1 : 0} // 호버 상태에 따른 투명도
                   />
                 </Box>
                 <Flex mt={5} direction="column" p={4} justify="center">
-                  <Text fontSize="lg" fontWeight="bold" textAlign="center">
+                  <Text fontSize="lg" fontWeight="bold">
                     [{board.manufacturer}] {board.title}
                   </Text>
-                  <Text color="gray.500" textAlign="center">
-                    {formatPrice(board.price)}원
-                  </Text>
+                  <Text color="gray.500">{formatPrice(board.price)}원</Text>
                 </Flex>
               </Box>
             ))}
