@@ -65,15 +65,15 @@ export function BoardEdit() {
       })
 
       // ----------------------- 상품 등록시 상세항목 추가 안한 상품 수정할때 상세항목 추가 가능하도록 -----------------------
-      // .then(() => {
-      //   // 새로운 상세 정보가 있다면 추가 요청
-      //   if (newDetails.length > 0) {
-      //     return axios.post("/api/board/addList", {
-      //       boardId: id,
-      //       newDetails,
-      //     });
-      //   }
-      // })
+      .then(() => {
+        // 새로운 상세 정보가 있다면 추가 요청
+        if (newDetails.length > 0) {
+          return axios.post("/api/board/addList", {
+            boardId: board.id,
+            newDetails,
+          });
+        }
+      })
       .then(() => {
         toast({
           description: id + "번 상품 수정 되었습니다.",
@@ -232,26 +232,26 @@ export function BoardEdit() {
               />
             </FormControl>
           )}
-
-          {/* 상품 등록 시 상세항목 추가 안했을경우 수정할때 안나오는데, 나오게 작업중 */}
-          {/*{newDetails.map((detail, index) => (*/}
-          {/*  <Flex key={index} my={2}>*/}
-          {/*    /!* 새로운 상세 정보 입력 필드 *!/*/}
-          {/*    <FormControl>*/}
-          {/*      <FormLabel>색상</FormLabel>*/}
-          {/*      <Input*/}
-          {/*        value={detail.color}*/}
-          {/*        onChange={(e) =>*/}
-          {/*          handleNewDetailChange(index, "color", e.target.value)*/}
-          {/*        }*/}
-          {/*      />*/}
-          {/*    </FormControl>*/}
-          {/*    /!* 다른 필드들도 이와 유사한 방식으로 추가 *!/*/}
-          {/*    /!* 예: axis, line, inch 등 *!/*/}
-          {/*  </Flex>*/}
-          {/*))}*/}
         </Flex>
       ))}
+
+      {/* 상품 등록 시 상세항목 추가 안했을경우 수정할때 안나오는데, 나오게 작업중 */}
+      {/*{newDetails.map((detail, index) => (*/}
+      {/*  <Flex key={index} my={2}>*/}
+      {/*    /!* 새로운 상세 정보 입력 필드 *!/*/}
+      {/*    <FormControl>*/}
+      {/*      <FormLabel>색상</FormLabel>*/}
+      {/*      <Input*/}
+      {/*        value={detail.color}*/}
+      {/*        onChange={(e) =>*/}
+      {/*          handleNewDetailChange(index, "color", e.target.value)*/}
+      {/*        }*/}
+      {/*      />*/}
+      {/*    </FormControl>*/}
+      {/*    /!* 다른 필드들도 이와 유사한 방식으로 추가 *!/*/}
+      {/*    /!* 예: axis, line, inch 등 *!/*/}
+      {/*  </Flex>*/}
+      {/*))}*/}
 
       <Button onClick={handleUpdate}>수정</Button>
       <Button onClick={() => navigate("/")}>돌아가기</Button>

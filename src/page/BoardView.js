@@ -201,7 +201,9 @@ export function BoardView() {
       <Center mt={10} mb={10} w={"100%"} justifyContent={"center"}>
         <Box w={"80%"}>
           <Box fontSize={"1.5rem"} p={0} border={"none"}>
-            <Text>{board.title}</Text>
+            <Text>
+              [{board.manufacturer}] {board.title}
+            </Text>
           </Box>
         </Box>
       </Center>
@@ -215,18 +217,18 @@ export function BoardView() {
                 {/* 메인 이미지 */}
                 <Box
                   w="100%"
-                  h="100%"
-                  bg="gray.200"
+                  h="550px"
                   position="relative"
                   overflow="hidden"
+                  bg={"none"}
                 >
                   <Image
                     key={board.mainImgs[currentImageIndex].id}
                     src={board.mainImgs[currentImageIndex].url}
                     alt={board.mainImgs[currentImageIndex].name}
-                    objectFit="cover"
+                    objectFit="contain"
                     w="100%"
-                    h="100%"
+                    h="550px"
                   />
                 </Box>
 
@@ -265,6 +267,7 @@ export function BoardView() {
                 fontSize={"20px"}
                 mt={-2}
                 border={"none"}
+                flex={1}
                 readOnly
               >
                 {formatPrice(board.price)}원
@@ -275,7 +278,7 @@ export function BoardView() {
               <FormLabel w="100px" fontWeight="bold">
                 상품 설명
               </FormLabel>
-              <Box mt={-2} border={"none"} fontWeight={"400"} readOnly>
+              <Box flex={1} mt={-2} fontWeight={"400"} border={"none"} readOnly>
                 {board.content}
               </Box>
             </HStack>
@@ -284,7 +287,7 @@ export function BoardView() {
               <FormLabel w="100px" fontWeight="bold">
                 제조사
               </FormLabel>
-              <Box mt={-2} border={"none"} fontWeight={"400"} readOnly>
+              <Box flex={1} mt={-2} border={"none"} fontWeight={"400"} readOnly>
                 {board.manufacturer}
               </Box>
             </HStack>
@@ -293,7 +296,7 @@ export function BoardView() {
               <FormLabel w="100px" fontWeight="bold">
                 배송
               </FormLabel>
-              <Box mt={-2} border={"none"} fontWeight={"400"}>
+              <Box flex={1} mt={-2} border={"none"} fontWeight={"400"}>
                 무료배송
               </Box>
             </HStack>

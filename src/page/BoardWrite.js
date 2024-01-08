@@ -24,20 +24,15 @@ export function BoardWrite() {
   const [content, setContent] = useState(""); // 상품설명
   const [price, setPrice] = useState(""); // 금액
   const [manufacturer, setManufacturer] = useState(""); // 제조사
-
-  const toast = useToast();
   const [mainImg, setMainImg] = useState(null); // 메인이미지
-
   const [color, setColor] = useState(""); // 상세선택 컬러
   const [axis, setAxis] = useState(""); // 상세선택 축
   const [line, setLine] = useState(""); // 상세선택 선 유무
   const [inch, setInch] = useState(""); // 상세선택 인치
-
   const [isSubmitting, setIsSubmitting] = useState(false); // 더블클릭 방지
-
   const navigate = useNavigate();
+  const toast = useToast();
   const [details, setDetails] = useState([]); // 상세선택 배열 상태
-
   const [productType, setProductType] = useState(""); // 상품 타입
 
   // ------------------------------ 저장버튼 클릭시 상품 저장 로직 ------------------------------
@@ -105,6 +100,7 @@ export function BoardWrite() {
     setDetails(details.slice(0, -1));
   };
 
+  // ------------------------------ 상세 선택항목 상품 종류 로직 ------------------------------
   const handleProductTypeChange = (event) => {
     setProductType(event.target.value);
     setDetails([]);
@@ -222,11 +218,6 @@ export function BoardWrite() {
             onChange={(e) => setManufacturer(e.target.value)}
           />
         </FormControl>
-
-        {/*<FormControl>*/}
-        {/*  <FormLabel>제조사</FormLabel>*/}
-        {/*  <Input value{company}*/}
-        {/*</FormControl>*/}
 
         <FormControl>
           <FormLabel>메인 이미지</FormLabel>
