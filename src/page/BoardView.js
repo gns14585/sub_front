@@ -158,19 +158,16 @@ export function BoardView() {
 
   // ------------------------------ 수량에 따라 총 가격 계산 로직 ------------------------------
   const calculateTotalPrice = () => {
-    // 상세선택이 없을 경우, 기본 판매가 반환
-    if (Object.keys(selectedDetails).length === 0) {
-      return formatPrice(board.price);
+    // 상세선택이 있고 선택된 상세선택이 있는 경우
+    if (details.length > 0 && Object.keys(selectedDetails).length > 0) {
+      return formatPrice(
+        Object.values(selectedDetails).reduce((sum, detail) => {
+          return sum + (detail.price || 0) * detail.quantity;
+        }, 0),
+      );
     }
-    // 상세선택이 있을 경우, 각 상세선택에 대한 추가 가격을 계산
-    const additionalPrice = Object.values(selectedDetails).reduce(
-      (total, detail) => {
-        return total + (detail.price || 0) * detail.quantity;
-      },
-      0,
-    );
-    // 상세선택이 있으면 추가 가격을, 없으면 기본 판매가를 반환
-    return formatPrice(additionalPrice);
+    // 상세선택이 있지만 아직 아무것도 선택되지 않았거나 상세선택 자체가 없는 경우
+    return formatPrice(details.length > 0 ? 0 : board.price);
   };
 
   // ------------------------------ 목록에있는 상품 삭제 로직 ------------------------------
@@ -370,8 +367,12 @@ export function BoardView() {
                         >
                           {/* ------------------- 상품 목록 ------------------- */}
                           <Text fontSize={"15px"} flex="1">
-                            {board.title} {detail.axis}, [{detail.color}{" "}
-                            {detail.inch}/{detail.line}]
+                            {board.title}
+                            <br />
+                            {detail.axis && `${detail.axis}, `}
+                            {detail.color && `${detail.color} `}
+                            {detail.inch && `${detail.inch}`}
+                            {detail.line && `${detail.line}`}
                           </Text>
 
                           {/* ------------------- 목록상품 삭제 버튼 ------------------- */}

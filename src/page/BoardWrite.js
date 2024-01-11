@@ -58,9 +58,6 @@ export function BoardWrite() {
 
         details.forEach((e) => (e.boardId = response.data)); // boardId 를 넣어줌
         axios.post("/api/board/addList", {
-          title,
-          content,
-          price,
           details: detailsToSend,
         });
         toast({
@@ -252,12 +249,12 @@ export function BoardWrite() {
 
         {/* 상세 정보 표시 */}
         {details.map((detail, index) => (
-          <Box key={index}>
+          <HStack key={index}>
             {detail.color && <Text>색상: {detail.color}</Text>}
             {detail.axis && <Text>스위치: {detail.axis}</Text>}
             {detail.line && <Text>선: {detail.line}</Text>}
             {detail.inch && <Text>인치: {detail.inch}</Text>}
-          </Box>
+          </HStack>
         ))}
 
         {/* 저장 버튼 */}
